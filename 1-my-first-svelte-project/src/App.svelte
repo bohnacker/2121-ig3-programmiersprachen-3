@@ -1,6 +1,8 @@
 <script>
+	import Popup from './Popup.svelte';
+
 	let todos = [
-		{ text: 'Learn Svelte', done: false },
+		{ text: 'Learn Svelte', done: false, label: 'red' },
 		{ text: 'Make something cool', done: false },
 		{ text: 'Carry on', done: false },
 	];
@@ -9,6 +11,8 @@
 	let inputText = '';
 
 	let hoveredItem;
+
+	let selectedItem;
 
 	function handleNewItemClick() {
 		if (inputText != '') {
@@ -25,14 +29,23 @@
 	}
 
 	function handleInputFocus() {
-		console.log('input got focus');
+		// console.log('input got focus');
 		inputFocussed = true;
 	}
 	function handleInputBlur() {
-		console.log('input lost focus');
+		// console.log('input lost focus');
 		inputFocussed = false;
 	}
+
+	function handleKeyup(event) {
+		// console.log(event);
+		if (event.key == 'Enter') {
+			handleNewItemClick();
+		}
+	}
 </script>
+
+
 
 <main>
 	<div id="container">
@@ -40,7 +53,14 @@
 
 		{#each todos as todo, index}
 			<div class="item" on:mouseenter={() => (hoveredItem = index)} on:mouseleave={() => (hoveredItem = undefined)}>
-				<div class="item-text" class:done={todo.done} on:click={() => todo.done = !todo.done}>{todo.text}</div>
+				<div
+					class="item-text"
+					class:done={todo.done == true}
+					style="color:{todo.label}"
+					on:click={() => (selectedItem = index)}
+				>
+					{todo.text}
+				</div>
 
 				{#if hoveredItem == index}
 					<div class="remove-button" on:click={() => removeItem(index)}>Remove</div>
@@ -50,13 +70,20 @@
 			</div>
 		{/each}
 
-		<input type="text" bind:value={inputText} on:focus={handleInputFocus} on:blur={handleInputBlur} />
+		<input type="text" bind:value={inputText} on:focus={handleInputFocus} on:blur={handleInputBlur} on:keyup={handleKeyup} />
 
 		{#if inputText != '' || inputFocussed}
 			<button on:click={handleNewItemClick}>Add</button>
 		{/if}
 	</div>
+
+	{#if selectedItem >= 0}
+		<Popup bind:label={todos[selectedItem].label} />
+	{/if}
 </main>
+
+
+
 
 <style>
 	#container {
