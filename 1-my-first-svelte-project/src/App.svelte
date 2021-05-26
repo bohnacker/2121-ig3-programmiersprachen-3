@@ -1,5 +1,8 @@
 <script>
+	import jquery from "jquery";
 	import Popup from './Popup.svelte';
+
+	console.log();
 
 	let todos = [
 		{ text: 'Learn Svelte', done: false, label: 'red' },
@@ -12,7 +15,15 @@
 
 	let hoveredItem;
 
-	let selectedItem;
+	let selectedItem = 1;
+
+	function handleItemClick(index) {
+		if (index != selectedItem) {
+			selectedItem = index;
+		} else {
+			selectedItem = undefined;
+		}
+	}
 
 	function handleNewItemClick() {
 		if (inputText != '') {
@@ -45,8 +56,6 @@
 	}
 </script>
 
-
-
 <main>
 	<div id="container">
 		<h2>Todos</h2>
@@ -54,10 +63,11 @@
 		{#each todos as todo, index}
 			<div class="item" on:mouseenter={() => (hoveredItem = index)} on:mouseleave={() => (hoveredItem = undefined)}>
 				<div
+					bind:this={todo.node}
 					class="item-text"
 					class:done={todo.done == true}
-					style="color:{todo.label}"
-					on:click={() => (selectedItem = index)}
+					style="color:{todo.label ?? 'black'}"
+					on:click={() => handleItemClick(index)}
 				>
 					{todo.text}
 				</div>
@@ -78,12 +88,9 @@
 	</div>
 
 	{#if selectedItem >= 0}
-		<Popup bind:label={todos[selectedItem].label} />
+		<Popup bind:item={todos[selectedItem]} bind:selectedItem />
 	{/if}
 </main>
-
-
-
 
 <style>
 	#container {
